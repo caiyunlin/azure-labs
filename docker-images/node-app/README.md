@@ -7,7 +7,6 @@ Port = process.env.PORT or 8080
 ```bash
 docker build -t cylin2000/node-app .
 docker run -dp 8080:8080 cylin2000/node-app
-docker push cylin2000/node-app
 ```
 
 - Test from browser 
