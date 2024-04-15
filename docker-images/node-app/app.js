@@ -8,7 +8,11 @@ http.createServer(function (req, res) {
 
   if (req.url == '/headers') {
     res.write(JSON.stringify(req.headers, null, 2));
-  } else {
+  } 
+  else if (req.url == '/env') {
+    res.write(JSON.stringify(process.env, null, 2));
+  }
+  else {
     var now = new Date();
     res.write('Hello World! Current time is '+ now.toISOString() + '\n');
   }
