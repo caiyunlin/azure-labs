@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "packageUri": {
-          "value": "https://zipfortesting.blob.core.windows.net/deployment/package.zip"
+          "value": "https://mystorage0322.blob.core.windows.net/shared/functionapp-dotnet8-http.zip"
       }
     }
   }
