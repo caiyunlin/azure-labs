@@ -12,3 +12,6 @@ Azure Labs contains the templates used to create Azure test environment quickly.
 1. Each lab inside one resource group, once the lab is done, clean up the rg
 2. For conponent name, use prefix + uniqueString , e.g. `[concat('ContainerAppEnv-', uniqueString(resourceGroup().id))]`
 3. Provide the Az CLI / PowerShell script to deploy the lab from local
+
+## References 
+- https://github.com/Azure/azure-quickstart-templates
