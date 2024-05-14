@@ -5,5 +5,5 @@ $rg = "lab-function-app-premium-plan-01"
 
 az group create -n $rg -l $location
 
-az deployment group create --name "demoDeploy-$(Get-Date).ToString('yyyyMMddHHmmss')" --resource-group $rg --template-file "$scriptPath\azuredeploy.json" 
+az deployment group create --name "demoDeploy-$((Get-Date).ToString('yyyyMMddHHmmss'))" --resource-group $rg --template-file "$scriptPath\azuredeploy.json" --parameters "$scriptPath\azuredeploy.parameters.json" --debug
 
