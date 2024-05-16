@@ -1,5 +1,5 @@
 @description('The name of the Azure Function app.')
-param functionAppName string = 'func-${uniqueString(resourceGroup().id)}'
+param functionAppName string = 'functionapp0510'
 
 @description('Storage Account type')
 @allowed([
@@ -22,33 +22,17 @@ param appInsightsLocation string = resourceGroup().location
   'python'
   'java'
 ])
-param functionWorkerRuntime string = 'node'
+param functionWorkerRuntime string = 'python'
 
-@description('Specifies the OS used for the Azure Function hosting plan.')
-@allowed([
-  'Windows'
-  'Linux'
-])
-param functionPlanOS string = 'Windows'
-
-@description('Specifies the Azure Function hosting plan SKU.')
-@allowed([
-  'EP1'
-  'EP2'
-  'EP3'
-])
-param functionAppPlanSku string = 'EP1'
+@description('Required for Linux app to represent runtime stack in the format of \'runtime|runtimeVersion\'. For example: \'python|3.9\'')
+param linuxFxVersion string = 'python|3.11'
 
 @description('The zip content url.')
-param packageUri string
-
-@description('Only required for Linux app to represent runtime stack in the format of \'runtime|runtimeVersion\'. For example: \'python|3.9\'')
-param linuxFxVersion string = ''
+param packageUri string = 'https://mystorage0322.blob.core.windows.net/shared/python-function2.zip'
 
 var hostingPlanName = functionAppName
 var applicationInsightsName = functionAppName
 var storageAccountName = '${uniqueString(resourceGroup().id)}azfunctions'
-var isReserved = ((functionPlanOS == 'Linux') ? true : false)
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
@@ -63,22 +47,21 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: hostingPlanName
   location: location
   sku: {
-    tier: 'ElasticPremium'
-    name: functionAppPlanSku
-    family: 'EP'
+    name: 'Y1'
+    tier: 'Dynamic'
+    size: 'Y1'
+    family: 'Y'
   }
   properties: {
-    maximumElasticWorkerCount: 20
-    reserved: isReserved
+    reserved: true
   }
-  kind: 'elastic'
 }
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+resource applicationInsight 'Microsoft.Insights/components@2020-02-02' = {
   name: applicationInsightsName
   location: appInsightsLocation
   tags: {
-    'hidden-link:${resourceId('Microsoft.Web/sites', applicationInsightsName)}': 'Resource'
+    'hidden-link:${resourceId('Microsoft.Web/sites', functionAppName)}': 'Resource'
   }
   properties: {
     Application_Type: 'web'
@@ -89,28 +72,20 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
   name: functionAppName
   location: location
-  kind: (isReserved ? 'functionapp,linux' : 'functionapp')
+  kind: 'functionapp,linux'
   properties: {
-    reserved: isReserved
+    reserved: true
     serverFarmId: hostingPlan.id
     siteConfig: {
-      linuxFxVersion: (isReserved ? linuxFxVersion : json('null'))
+      linuxFxVersion: linuxFxVersion
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: reference(applicationInsights.id, '2020-02-02').InstrumentationKey
+          value: reference(resourceId('Microsoft.Insights/components', functionAppName), '2020-02-02').InstrumentationKey
         }
         {
           name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, '2022-05-01').keys[0].value}'
-        }
-        {
-          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(storageAccount.id, '2022-05-01').keys[0].value}'
-        }
-        {
-          name: 'WEBSITE_CONTENTSHARE'
-          value: toLower(functionAppName)
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
         }
         {
           name: 'FUNCTIONS_EXTENSION_VERSION'
@@ -120,23 +95,96 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
           name: 'FUNCTIONS_WORKER_RUNTIME'
           value: functionWorkerRuntime
         }
+        // {
+        //   name: 'WEBSITE_RUN_FROM_PACKAGE'
+        //   value: packageUri
+        // }
         {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~14'
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'true'
         }
         {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
+          name:'ENABLE_ORYX_BUILD'
+          value:'true'
         }
       ]
     }
   }
+  dependsOn: [
+    applicationInsight
+  ]
 }
 
-resource functionAppName_zipdeploy 'Microsoft.Web/sites/extensions@2022-03-01' = {
+resource zipDeploy 'Microsoft.Web/sites/extensions@2022-09-01' = {
   parent: functionApp
-  name: 'zipdeploy'
+  name: 'MSDeploy'
   properties: {
     packageUri: packageUri
+    appOffline: true
   }
 }
+
+
+resource functionAppHost 'Microsoft.Web/sites/host@2022-09-01' existing = {
+  name: 'default'
+  parent: functionApp
+}
+
+@description('The name of the logic app to create.')
+param logicAppName string = 'logicapptest0510'
+
+@description('A test URI')
+var testUri  = 'https://${functionApp.name}.azurewebsites.net/api/HttpTrigger1?code=${functionAppHost.listKeys().masterKey}'
+
+var frequency = 'Hour'
+var interval = '1'
+var type = 'recurrence'
+var actionType = 'http'
+var method = 'GET'
+var workflowSchema = 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
+
+resource stg 'Microsoft.Logic/workflows@2019-05-01' = {
+  name: logicAppName
+  location: location
+  tags: {
+    displayName: logicAppName
+  }
+  properties: {
+    definition: {
+      '$schema': workflowSchema
+      contentVersion: '1.0.0.0'
+      parameters: {
+        testUri: {
+          type: 'string'
+          defaultValue: testUri
+        }
+      }
+      triggers: {
+        recurrence: {
+          type: type
+          recurrence: {
+            frequency: frequency
+            interval: interval
+          }
+        }
+      }
+      actions: {
+        actionType: {
+          type: actionType
+          inputs: {
+            method: method
+            uri: testUri
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+
+output name string = stg.name
+output resourceId string = stg.id
+output resourceGroupName string = resourceGroup().name
+output location string = location
