@@ -428,6 +428,10 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
           name: 'WEBSITE_CONTENTOVERVNET'
           value: '1'
         }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: packageUri
+        }
       ]
     }
   }
@@ -457,14 +461,14 @@ resource networkConfig 'Microsoft.Web/sites/networkConfig@2022-03-01' = {
 }
 
 
-resource zipDeploy 'Microsoft.Web/sites/extensions@2022-09-01' = {
-  parent: functionApp
-  name: 'MSDeploy'
-  properties: {
-    packageUri: packageUri
-    appOffline: true
-  }
-}
+// resource zipDeploy 'Microsoft.Web/sites/extensions@2022-09-01' = {
+//   parent: functionApp
+//   name: 'MSDeploy'
+//   properties: {
+//     packageUri: packageUri
+//     appOffline: true
+//   }
+// }
 
 
 resource functionAppHost 'Microsoft.Web/sites/host@2022-09-01' existing = {
