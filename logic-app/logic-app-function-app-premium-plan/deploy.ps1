@@ -1,7 +1,7 @@
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $location = "eastus"
-$rg = "lab-logic-app-function-app-premium-plan-05"
+$rg = "lab-logic-app-function-app-premium-plan-06"
 
 az group create -n $rg -l $location
 

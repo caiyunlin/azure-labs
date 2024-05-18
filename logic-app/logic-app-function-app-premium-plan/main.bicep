@@ -525,6 +525,9 @@ resource stg 'Microsoft.Logic/workflows@2019-05-01' = {
       }
     }
   }
+  dependsOn: [
+    functionApp
+  ]
 }
 
 
