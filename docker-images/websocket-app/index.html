@@ -1,33 +1,37 @@
 <html>
-  <head>
-    <script type="text/javascript">
-      const ws = new WebSocket('ws://' + window.location.host);
-      // Browser WebSockets have slightly different syntax than `ws`.
-      // Instead of EventEmitter syntax `on('open')`, you assign a callback
-      // to the `onopen` property.
-      ws.onopen = function() {
-        document.querySelector('#send').disabled = false;
-        document.querySelector('#send').addEventListener('click', function() {
-          var msg = document.querySelector('#message').value;
-          ws.send(msg);
-          document.getElementById('messages').innerHTML += 'Client: ' + msg + "<br/>";
-        });
-      };
 
-      ws.onmessage = function(msg) {
-        console.log("Recived from server : " + msg.data);
+<head>
+  <title>WebSocket Chat Test</title>
+</head>
 
-        document.getElementById('messages').innerHTML += 'Server: ' + msg.data + "<br/>";
-      };
-    </script>
-  </head>
-  <body>
-    <h1>Chat</h1>
-    <div>
-      <input id="message" placeholder="Message">
-      <button id="send" disabled="true">Send</button>
-    </div>
-    <div id="messages">
-    </div>
-  </body>
+<body>
+  <h1>Chat</h1>
+  <div>
+    <input id="message" placeholder="Message">
+    <button id="send" disabled="true">Send</button>
+  </div>
+  <div id="messages">
+  </div>
+  <script type="text/javascript">
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(protocol + '://' + window.location.host);
+    // Browser WebSockets have slightly different syntax than `ws`.
+    // Instead of EventEmitter syntax `on('open')`, you assign a callback
+    // to the `onopen` property.
+    ws.onopen = function () {
+      document.querySelector('#send').disabled = false;
+      document.querySelector('#send').addEventListener('click', function () {
+        var msg = document.querySelector('#message').value;
+        ws.send(msg);
+        document.getElementById('messages').innerHTML += 'Client: ' + msg + "<br/>";
+      });
+    };
+
+    ws.onmessage = function (msg) {
+      console.log("Recived from server : " + msg.data);
+      document.getElementById('messages').innerHTML += 'Server: ' + msg.data + "<br/>";
+    };
+  </script>
+</body>
+
 </html>
