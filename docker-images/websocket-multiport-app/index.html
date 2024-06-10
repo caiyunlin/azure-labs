@@ -18,7 +18,8 @@
   <script type="text/javascript">
     var ws; // websocket object
     var protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    var webSocketUrl = protocol + '://' + window.location.host;
+    var wssHost = window.location.host.includes("8080") ? window.location.host.replace("8080","3000") : window.location.host + ":3000";
+    var webSocketUrl = protocol + '://' + wssHost;
 
     // set the default server url
     document.querySelector('#server').value = webSocketUrl;
@@ -48,3 +49,7 @@
 </body>
 
 </html>
+
+
+
+
