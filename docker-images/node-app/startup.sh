@@ -1,5 +1,8 @@
 #!/bin/sh
-ip=$(ifconfig eth0 | awk '/inet addr/ {gsub("addr:", "", $2); print $2}')
-echo "$ip xxx.xxx.com" >> /etc/hosts
+
+set -e
+/usr/sbin/sshd
+
+echo "10.160.211.122 paysol-mlj001.ntt-finance.co.jp" >> /etc/hosts
 
 node ./app.js
