@@ -4,7 +4,7 @@
     "parameters": {
       "webAppName": {
         "type": "string",
-        "defaultValue": "[concat('applinux-', uniqueString(resourceGroup().id))]",
+        "defaultValue": "[concat('linuxapp-', uniqueString(resourceGroup().id))]",
         "metadata": {
           "description": "Base name of the resource such as web app name and app service plan "
         },
