@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "webAppName": {
-      "value": "linuxnodeapp-test"
+      "value": "linuxapp-test"
     },
     "sku": {
       "value": "B1"
     },
     "linuxFxVersion": {
-      "value": "NODE|18-lts"
+      "value": "NODE|24-lts"
     }
   }
 }

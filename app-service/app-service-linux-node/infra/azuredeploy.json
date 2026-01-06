@@ -4,7 +4,7 @@
     "parameters": {
       "webAppName": {
         "type": "string",
-        "defaultValue": "[concat('AzureLinuxNodeApp-', uniqueString(resourceGroup().id))]",
+        "defaultValue": "[concat('linuxapp-', uniqueString(resourceGroup().id))]",
         "metadata": {
           "description": "Base name of the resource such as web app name and app service plan "
         },
@@ -31,7 +31,7 @@
       },
       "linuxFxVersion": {
         "type": "string",
-        "defaultValue": "NODE|18-lts",
+        "defaultValue": "NODE|24-lts",
         "metadata": {
           "description": "The Runtime stack of current web app"
         }
@@ -46,7 +46,7 @@
     },
     "variables": {
       "webAppPortalName": "[concat(parameters('webAppName'), '')]",
-      "appServicePlanName": "[concat('AppServicePlan-', parameters('webAppName'))]"
+      "appServicePlanName": "[concat('ASP-', parameters('webAppName'))]"
     },
     "resources": [
       {
