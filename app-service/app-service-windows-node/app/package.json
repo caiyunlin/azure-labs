@@ -1,0 +1,10 @@
+{
+  "name": "node-app-win",
+  "version": "1.0.0",
+  "description": "Simple Node.js App for Azure App Service (Windows)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {}
+}
