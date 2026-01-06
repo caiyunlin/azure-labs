@@ -1,0 +1,10 @@
+{
+  "name": "node-app",
+  "version": "1.0.0",
+  "description": "Simple Node.js App for Azure App Service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {}
+}
