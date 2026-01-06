@@ -1,5 +1,21 @@
 *.zip
 
-bin
-obj
-publish
+# Dotnet
+bin/
+obj/
+publish/
+
+# Java
+target/
+*.class
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
